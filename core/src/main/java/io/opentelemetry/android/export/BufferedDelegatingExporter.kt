@@ -63,6 +63,8 @@ internal abstract class BufferedDelegatingExporter<T, D>(private val bufferSize:
     }
 
     fun bufferedShutDown(): CompletableResultCode {
+        isShutDown.set(true)
+
         return withDelegateOrNull {
             if (it != null) {
                 flushToDelegate(it)
