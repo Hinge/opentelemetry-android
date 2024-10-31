@@ -90,8 +90,6 @@ public final class OpenTelemetryRumBuilder {
 
     private Resource resource;
 
-    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
-
     private static TextMapPropagator buildDefaultPropagator() {
         return TextMapPropagator.composite(
                 W3CTraceContextPropagator.getInstance(), W3CBaggagePropagator.getInstance());
@@ -279,6 +277,8 @@ public final class OpenTelemetryRumBuilder {
         InitializationEvents initializationEvents = InitializationEvents.get();
         applyConfiguration(serviceManager, initializationEvents);
 
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+
         BufferDelegatingLogExporter bufferDelegatingLogExporter =
                 new BufferDelegatingLogExporter();
 
@@ -321,6 +321,8 @@ public final class OpenTelemetryRumBuilder {
                             bufferDelegatingSpanExporter,
                             bufferDelegatingLogExporter);
                 });
+
+        executorService.shutdown();
 
         instrumentations.forEach(delegate::addInstrumentation);
 
