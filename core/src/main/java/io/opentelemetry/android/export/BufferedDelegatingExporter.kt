@@ -57,7 +57,6 @@ internal abstract class BufferedDelegatingExporter<T, D>(private val bufferedSig
      * @param block the block to execute
      */
     protected fun <R> withDelegateOrNull(block: (D?) -> R): R {
-        val delegate = this.delegate
         return if (delegate != null) {
             block(delegate)
         } else {
