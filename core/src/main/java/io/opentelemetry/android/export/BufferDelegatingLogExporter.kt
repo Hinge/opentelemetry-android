@@ -16,8 +16,8 @@ import io.opentelemetry.sdk.logs.export.LogRecordExporter
  * The buffer size is set to 5,000 by default. If the buffer is full, the exporter will drop new log records.
  */
 internal class BufferDelegatingLogExporter(
-    bufferSize: Int = 5_000
-): BufferedDelegatingExporter<LogRecordData, LogRecordExporter>(bufferSize = bufferSize), LogRecordExporter {
+    maxBufferedLogs: Int = 5_000
+): BufferedDelegatingExporter<LogRecordData, LogRecordExporter>(bufferedSignals = maxBufferedLogs), LogRecordExporter {
 
     override fun exportToDelegate(delegate: LogRecordExporter, data: Collection<LogRecordData>): CompletableResultCode {
         return delegate.export(data)

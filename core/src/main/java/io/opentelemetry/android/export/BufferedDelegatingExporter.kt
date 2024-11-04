@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  *
  * The buffer size is set to 5,000 by default. If the buffer is full, the exporter will drop new span data.
  */
-internal abstract class BufferedDelegatingExporter<T, D>(private val bufferSize: Int = 5_000) {
+internal abstract class BufferedDelegatingExporter<T, D>(private val bufferedSignals: Int = 5_000) {
     private var delegate: D? = null
     private val buffer = mutableListOf<T>()
     private val lock = Any()
@@ -25,13 +25,11 @@ internal abstract class BufferedDelegatingExporter<T, D>(private val bufferSize:
      */
     fun setDelegate(delegate: D) {
         synchronized(lock) {
-            if (this.delegate != null) {
-                throw IllegalStateException("Exporter delegate has already been set.")
-            }
-
-            this.delegate = delegate
+            check (this.delegate == null) { "Exporter delegate has already been set." }
 
             flushToDelegate(delegate)
+
+            this.delegate = delegate
 
             if (isShutDown.get()) shutdownDelegate(delegate)
         }
@@ -42,12 +40,12 @@ internal abstract class BufferedDelegatingExporter<T, D>(private val bufferSize:
      *
      * @param data the data to buffer or export
      */
-    fun bufferOrDelegate(data: Collection<T>): CompletableResultCode =
+    protected fun bufferOrDelegate(data: Collection<T>): CompletableResultCode =
         withDelegateOrNull {
             if (it != null) {
                 exportToDelegate(it, data)
             } else {
-                val amountToTake = bufferSize - buffer.size
+                val amountToTake = bufferedSignals - buffer.size
                 buffer.addAll(data.take(amountToTake))
                 CompletableResultCode.ofSuccess()
             }
@@ -58,11 +56,16 @@ internal abstract class BufferedDelegatingExporter<T, D>(private val bufferSize:
      *
      * @param block the block to execute
      */
-    fun <T> withDelegateOrNull(block: (D?) -> T): T {
-        return delegate?.let {  block(it) } ?: synchronized(lock) { block(delegate) }
+    protected fun <T> withDelegateOrNull(block: (D?) -> T): T {
+        val delegate = this.delegate
+        return if (delegate != null) {
+            block(delegate)
+        } else {
+            synchronized(lock) { block(delegate) }
+        }
     }
 
-    fun bufferedShutDown(): CompletableResultCode {
+    protected fun bufferedShutDown(): CompletableResultCode {
         isShutDown.set(true)
 
         return withDelegateOrNull {
