@@ -57,11 +57,8 @@ internal abstract class BufferedDelegatingExporter<T, D>(private val bufferedSig
      * @param block the block to execute
      */
     protected fun <R> withDelegateOrNull(block: (D?) -> R): R {
-        return if (delegate != null) {
-            block(delegate)
-        } else {
-            synchronized(lock) { block(delegate) }
-        }
+        delegate?.let { return block(it) }
+        return synchronized(lock) { block(delegate) }
     }
 
     protected fun bufferedShutDown(): CompletableResultCode {
