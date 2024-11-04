@@ -23,9 +23,8 @@ class BufferDelegatingSpanExporterTest {
         bufferDelegatingSpanExporter.export(listOf(spanData))
         bufferDelegatingSpanExporter.setDelegate(spanExporter)
 
-        val spans: List<SpanData> = spanExporter.finishedSpanItems
-        assertThat(spans).hasSize(1)
-        assertThat(spans[0]).isEqualTo(spanData)
+        assertThat(spanExporter.finishedSpanItems)
+            .containsExactly(spanData)
     }
 
     @Test
@@ -40,8 +39,8 @@ class BufferDelegatingSpanExporterTest {
 
         bufferDelegatingSpanExporter.setDelegate(spanExporter)
 
-        val spans = spanExporter.finishedSpanItems
-        assertThat(spans).hasSize(10)
+        assertThat(spanExporter.finishedSpanItems)
+            .hasSize(10)
     }
 
     @Test

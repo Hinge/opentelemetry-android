@@ -16,8 +16,8 @@ import io.opentelemetry.sdk.trace.export.SpanExporter
  * The buffer size is set to 5,000 by default. If the buffer is full, the exporter will drop new span data.
  */
 internal class BufferDelegatingSpanExporter(
-    bufferSize: Int = 5_000
-): BufferedDelegatingExporter<SpanData, SpanExporter>(bufferSize = bufferSize), SpanExporter {
+    maxBufferedSpans: Int = 5_000
+): BufferedDelegatingExporter<SpanData, SpanExporter>(bufferedSignals = maxBufferedSpans), SpanExporter {
 
     override fun exportToDelegate(delegate: SpanExporter, data: Collection<SpanData>): CompletableResultCode {
         return delegate.export(data)

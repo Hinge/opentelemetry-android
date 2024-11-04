@@ -23,9 +23,8 @@ class BufferDelegatingLogExporterTest {
         inMemoryBufferDelegatingLogExporter.export(listOf(logRecordData))
         inMemoryBufferDelegatingLogExporter.setDelegate(logRecordExporter)
 
-        val logs: List<LogRecordData> = logRecordExporter.finishedLogRecordItems
-        assertThat(logs).hasSize(1)
-        assertThat(logs[0]).isEqualTo(logRecordData)
+        assertThat(logRecordExporter.finishedLogRecordItems)
+            .containsExactly(logRecordData)
     }
 
     @Test
@@ -40,8 +39,8 @@ class BufferDelegatingLogExporterTest {
 
         inMemoryBufferDelegatingLogExporter.setDelegate(logRecordExporter)
 
-        val logs = logRecordExporter.getFinishedLogRecordItems()
-        assertThat(logs).hasSize(10)
+        assertThat(logRecordExporter.finishedLogRecordItems)
+            .hasSize(10)
     }
 
     @Test
