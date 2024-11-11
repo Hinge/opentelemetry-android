@@ -4,14 +4,14 @@ import io.opentelemetry.sdk.common.CompletableResultCode
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
- * An in-memory buffer delegating span exporter that buffers span data in memory until a delegate is set.
- * Once a delegate is set, the buffered span data is exported to the delegate.
+ * An in-memory buffer delegating signal exporter that buffers signal in memory until a delegate is set.
+ * Once a delegate is set, the buffered signals are exported to the delegate.
  *
- * The buffer size is set to 5,000 by default. If the buffer is full, the exporter will drop new span data.
+ * The buffer size is set to 5,000 by default. If the buffer is full, the exporter will drop new signals.
  */
 internal abstract class BufferedDelegatingExporter<T, D>(private val bufferedSignals: Int = 5_000) {
     private var delegate: D? = null
-    private val buffer = mutableListOf<T>()
+    private val buffer = arrayListOf<T>()
     private val lock = Any()
     private var isShutDown = AtomicBoolean(false)
 
@@ -22,6 +22,8 @@ internal abstract class BufferedDelegatingExporter<T, D>(private val bufferedSig
      * If this exporter has been shut down, the delegate will be shut down immediately.
      *
      * @param delegate the delegate to set
+     *
+     *  @throws IllegalStateException if a delegate has already been set
      */
     fun setDelegate(delegate: D) {
         synchronized(lock) {
@@ -31,7 +33,9 @@ internal abstract class BufferedDelegatingExporter<T, D>(private val bufferedSig
 
             this.delegate = delegate
 
-            if (isShutDown.get()) shutdownDelegate(delegate)
+            if (isShutDown.get()) {
+                shutdownDelegate(delegate)
+            }
         }
     }
 
@@ -70,6 +74,7 @@ internal abstract class BufferedDelegatingExporter<T, D>(private val bufferedSig
     private fun flushToDelegate(delegate: D) {
         exportToDelegate(delegate, buffer)
         buffer.clear()
+        buffer.trimToSize()
     }
 
     private fun bufferedShutDown(): CompletableResultCode {
@@ -77,7 +82,6 @@ internal abstract class BufferedDelegatingExporter<T, D>(private val bufferedSig
 
         return withDelegateOrNull {
             if (it != null) {
-                flushToDelegate(it)
                 shutdownDelegate(it)
             } else {
                 CompletableResultCode.ofSuccess()

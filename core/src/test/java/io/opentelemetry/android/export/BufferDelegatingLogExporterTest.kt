@@ -19,7 +19,7 @@ class BufferDelegatingLogExporterTest {
         val inMemoryBufferDelegatingLogExporter = BufferDelegatingLogExporter()
         val logRecordExporter = InMemoryLogRecordExporter.create()
 
-        val logRecordData: LogRecordData = mockk<LogRecordData>()
+        val logRecordData= mockk<LogRecordData>()
         inMemoryBufferDelegatingLogExporter.export(listOf(logRecordData))
         inMemoryBufferDelegatingLogExporter.setDelegate(logRecordExporter)
 
@@ -32,8 +32,8 @@ class BufferDelegatingLogExporterTest {
         val inMemoryBufferDelegatingLogExporter = BufferDelegatingLogExporter(10)
         val logRecordExporter = InMemoryLogRecordExporter.create()
 
-        for (i in 1..11) {
-            val logRecordData: LogRecordData = mockk<LogRecordData>()
+        repeat(11) {
+            val logRecordData= mockk<LogRecordData>()
             inMemoryBufferDelegatingLogExporter.export(listOf(logRecordData))
         }
 
@@ -48,7 +48,7 @@ class BufferDelegatingLogExporterTest {
         val inMemoryBufferDelegatingLogExporter = BufferDelegatingLogExporter()
         val delegate = spyk<InMemoryLogRecordExporter>()
 
-        val logRecordData: LogRecordData = mockk<LogRecordData>()
+        val logRecordData= mockk<LogRecordData>()
         inMemoryBufferDelegatingLogExporter.export(listOf(logRecordData))
 
         inMemoryBufferDelegatingLogExporter.setDelegate(delegate)
@@ -63,7 +63,7 @@ class BufferDelegatingLogExporterTest {
         val inMemoryBufferDelegatingLogExporter = BufferDelegatingLogExporter()
         val delegate = spyk<InMemoryLogRecordExporter>()
 
-        val logRecordData: LogRecordData = mockk<LogRecordData>()
+        val logRecordData= mockk<LogRecordData>()
         inMemoryBufferDelegatingLogExporter.export(listOf(logRecordData))
 
         verify(exactly = 0) { delegate.export(any()) }
@@ -72,7 +72,7 @@ class BufferDelegatingLogExporterTest {
 
         verify(exactly = 1) { delegate.export(any()) }
 
-        val logRecordData2: LogRecordData = mockk<LogRecordData>()
+        val logRecordData2= mockk<LogRecordData>()
         inMemoryBufferDelegatingLogExporter.export(listOf(logRecordData2))
 
         verify(exactly = 2) { delegate.export(any()) }
