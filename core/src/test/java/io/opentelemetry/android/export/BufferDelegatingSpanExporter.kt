@@ -19,7 +19,7 @@ class BufferDelegatingSpanExporterTest {
         val bufferDelegatingSpanExporter = BufferDelegatingSpanExporter()
         val spanExporter = InMemorySpanExporter.create()
 
-        val spanData: SpanData = mockk<SpanData>()
+        val spanData = mockk<SpanData>()
         bufferDelegatingSpanExporter.export(listOf(spanData))
         bufferDelegatingSpanExporter.setDelegate(spanExporter)
 
@@ -32,8 +32,8 @@ class BufferDelegatingSpanExporterTest {
         val bufferDelegatingSpanExporter = BufferDelegatingSpanExporter(10)
         val spanExporter = InMemorySpanExporter.create()
 
-        for (i in 1..11) {
-            val spanData: SpanData = mockk<SpanData>()
+        repeat(11) {
+            val spanData = mockk<SpanData>()
             bufferDelegatingSpanExporter.export(listOf(spanData))
         }
 
@@ -48,10 +48,12 @@ class BufferDelegatingSpanExporterTest {
         val bufferDelegatingSpanExporter = BufferDelegatingSpanExporter()
         val delegate = spyk<InMemorySpanExporter>()
 
-        val spanData: SpanData = mockk<SpanData>()
+        val spanData = mockk<SpanData>()
         bufferDelegatingSpanExporter.export(listOf(spanData))
 
         bufferDelegatingSpanExporter.setDelegate(delegate)
+
+        verify(exactly = 0) { delegate.flush() }
 
         bufferDelegatingSpanExporter.flush()
 
@@ -63,7 +65,7 @@ class BufferDelegatingSpanExporterTest {
         val bufferDelegatingSpanExporter = BufferDelegatingSpanExporter()
         val delegate = spyk<InMemorySpanExporter>()
 
-        val spanData: SpanData = mockk<SpanData>()
+        val spanData = mockk<SpanData>()
         bufferDelegatingSpanExporter.export(listOf(spanData))
 
         verify(exactly = 0) { delegate.export(any()) }
@@ -72,7 +74,7 @@ class BufferDelegatingSpanExporterTest {
 
         verify(exactly = 1) { delegate.export(any()) }
 
-        val spanData2: SpanData = mockk<SpanData>()
+        val spanData2 = mockk<SpanData>()
         bufferDelegatingSpanExporter.export(listOf(spanData2))
 
         verify(exactly = 2) { delegate.export(any()) }
@@ -94,7 +96,7 @@ class BufferDelegatingSpanExporterTest {
     fun `test flush without delegate`() {
         val bufferDelegatingSpanExporter = BufferDelegatingSpanExporter()
 
-        val spanData: SpanData = mockk<SpanData>()
+        val spanData = mockk<SpanData>()
         bufferDelegatingSpanExporter.export(listOf(spanData))
 
         val flushResult = bufferDelegatingSpanExporter.flush()
@@ -106,7 +108,7 @@ class BufferDelegatingSpanExporterTest {
     fun `test shutdown without delegate`() {
         val bufferDelegatingSpanExporter = BufferDelegatingSpanExporter()
 
-        val spanData: SpanData = mockk<SpanData>()
+        val spanData = mockk<SpanData>()
         bufferDelegatingSpanExporter.export(listOf(spanData))
 
         val shutdownResult = bufferDelegatingSpanExporter.shutdown()

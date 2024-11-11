@@ -17,23 +17,24 @@ import io.opentelemetry.sdk.logs.export.LogRecordExporter
  */
 internal class BufferDelegatingLogExporter(
     maxBufferedLogs: Int = 5_000
-): BufferedDelegatingExporter<LogRecordData, LogRecordExporter>(bufferedSignals = maxBufferedLogs), LogRecordExporter {
+) : BufferedDelegatingExporter<LogRecordData, LogRecordExporter>(bufferedSignals = maxBufferedLogs),
+    LogRecordExporter {
 
-    override fun exportToDelegate(delegate: LogRecordExporter, data: Collection<LogRecordData>): CompletableResultCode {
-        return delegate.export(data)
-    }
+    override fun exportToDelegate(
+        delegate: LogRecordExporter,
+        data: Collection<LogRecordData>
+    ): CompletableResultCode = delegate.export(data)
 
-    override fun shutdownDelegate(delegate: LogRecordExporter): CompletableResultCode {
-        return delegate.shutdown()
-    }
 
-    override fun export(logs: Collection<LogRecordData>): CompletableResultCode {
-        return bufferOrDelegate(logs)
-    }
+    override fun shutdownDelegate(delegate: LogRecordExporter): CompletableResultCode =
+        delegate.shutdown()
 
-    override fun flush(): CompletableResultCode {
-        return withDelegateOrNull { delegate ->
-            delegate?.flush() ?: CompletableResultCode.ofSuccess()
-        }
+
+    override fun export(logs: Collection<LogRecordData>): CompletableResultCode =
+        bufferOrDelegate(logs)
+
+
+    override fun flush(): CompletableResultCode = withDelegateOrNull { delegate ->
+        delegate?.flush() ?: CompletableResultCode.ofSuccess()
     }
 }
