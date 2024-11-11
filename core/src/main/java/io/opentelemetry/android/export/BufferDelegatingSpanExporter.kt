@@ -40,9 +40,5 @@ internal class BufferDelegatingSpanExporter(
     override fun shutdown(): CompletableResultCode {
         return bufferedShutDown()
     }
-
-    override fun close() {
-        shutdown()
-    }
 }
 
