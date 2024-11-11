@@ -9,6 +9,16 @@ import static java.util.Objects.requireNonNull;
 
 import android.app.Application;
 import android.util.Log;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
+
+import javax.annotation.Nullable;
+
 import io.opentelemetry.android.common.RumConstants;
 import io.opentelemetry.android.config.OtelRumConfig;
 import io.opentelemetry.android.export.BufferDelegatingLogExporter;
@@ -52,15 +62,6 @@ import io.opentelemetry.sdk.trace.SdkTracerProviderBuilder;
 import io.opentelemetry.sdk.trace.SpanProcessor;
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import javax.annotation.Nullable;
 
 /**
  * A builder of {@link OpenTelemetryRum}. It enabled configuring the OpenTelemetry SDK and disabling
@@ -277,8 +278,6 @@ public final class OpenTelemetryRumBuilder {
         InitializationEvents initializationEvents = InitializationEvents.get();
         applyConfiguration(serviceManager, initializationEvents);
 
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
-
         BufferDelegatingLogExporter bufferDelegatingLogExporter =
                 new BufferDelegatingLogExporter();
 
@@ -313,16 +312,13 @@ public final class OpenTelemetryRumBuilder {
                         config.shouldDiscoverInstrumentations(),
                         serviceManager);
 
-        executorService.execute(
-                () -> {
-                    initializeExporters(
-                            serviceManager,
-                            initializationEvents,
-                            bufferDelegatingSpanExporter,
-                            bufferDelegatingLogExporter);
-                });
-
-        executorService.shutdown();
+        android.os.AsyncTask.THREAD_POOL_EXECUTOR.execute(() -> {
+            initializeExporters(
+                    serviceManager,
+                    initializationEvents,
+                    bufferDelegatingSpanExporter,
+                    bufferDelegatingLogExporter);
+        });
 
         instrumentations.forEach(delegate::addInstrumentation);
 

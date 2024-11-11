@@ -61,7 +61,18 @@ internal abstract class BufferedDelegatingExporter<T, D>(private val bufferedSig
         return synchronized(lock) { block(delegate) }
     }
 
-    protected fun bufferedShutDown(): CompletableResultCode {
+    open fun shutdown(): CompletableResultCode = bufferedShutDown()
+
+    protected abstract fun exportToDelegate(delegate: D, data: Collection<T>): CompletableResultCode
+
+    protected abstract fun shutdownDelegate(delegate: D): CompletableResultCode
+
+    private fun flushToDelegate(delegate: D) {
+        exportToDelegate(delegate, buffer)
+        buffer.clear()
+    }
+
+    private fun bufferedShutDown(): CompletableResultCode {
         isShutDown.set(true)
 
         return withDelegateOrNull {
@@ -72,14 +83,5 @@ internal abstract class BufferedDelegatingExporter<T, D>(private val bufferedSig
                 CompletableResultCode.ofSuccess()
             }
         }
-    }
-
-    protected abstract fun exportToDelegate(delegate: D, data: Collection<T>): CompletableResultCode
-
-    protected abstract fun shutdownDelegate(delegate: D): CompletableResultCode
-
-    private fun flushToDelegate(delegate: D) {
-        exportToDelegate(delegate, buffer)
-        buffer.clear()
     }
 }
