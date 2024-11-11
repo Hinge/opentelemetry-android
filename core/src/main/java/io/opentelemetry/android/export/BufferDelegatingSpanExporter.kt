@@ -13,7 +13,7 @@ import io.opentelemetry.sdk.trace.export.SpanExporter
  * An in-memory buffer delegating span exporter that buffers span data in memory until a delegate is set.
  * Once a delegate is set, the buffered span data is exported to the delegate.
  *
- * The buffer size is set to 5,000 by default. If the buffer is full, the exporter will drop new span data.
+ * The buffer size is set to 5,000 spans by default. If the buffer is full, the exporter will drop new span data.
  */
 internal class BufferDelegatingSpanExporter(
     maxBufferedSpans: Int = 5_000
