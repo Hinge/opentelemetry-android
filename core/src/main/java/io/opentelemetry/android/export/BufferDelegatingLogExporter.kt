@@ -13,7 +13,7 @@ import io.opentelemetry.sdk.logs.export.LogRecordExporter
  * An in-memory buffer delegating log exporter that buffers log records in memory until a delegate is set.
  * Once a delegate is set, the buffered log records are exported to the delegate.
  *
- * The buffer size is set to 5,000 by default. If the buffer is full, the exporter will drop new log records.
+ * The buffer size is set to 5,000 log entries by default. If the buffer is full, the exporter will drop new log records.
  */
 internal class BufferDelegatingLogExporter(
     maxBufferedLogs: Int = 5_000
