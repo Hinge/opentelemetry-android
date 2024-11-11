@@ -36,8 +36,4 @@ internal class BufferDelegatingLogExporter(
             delegate?.flush() ?: CompletableResultCode.ofSuccess()
         }
     }
-
-    override fun shutdown(): CompletableResultCode {
-        return bufferedShutDown()
-    }
 }

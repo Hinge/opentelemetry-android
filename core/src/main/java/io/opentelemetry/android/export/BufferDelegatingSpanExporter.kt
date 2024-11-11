@@ -36,9 +36,5 @@ internal class BufferDelegatingSpanExporter(
             delegate?.flush() ?: CompletableResultCode.ofSuccess()
         }
     }
-
-    override fun shutdown(): CompletableResultCode {
-        return bufferedShutDown()
-    }
 }
 
