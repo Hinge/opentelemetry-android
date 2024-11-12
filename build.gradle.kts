@@ -25,12 +25,6 @@ allprojects {
         google()
         mavenCentral()
     }
-
-    if (findProperty("final") != "true") {
-        version = "$version-hinge-SNAPSHOT"
-    } else {
-        version = "$version-hinge"
-    }
 }
 
 subprojects {
