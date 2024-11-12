@@ -25,8 +25,11 @@ allprojects {
         google()
         mavenCentral()
     }
+
     if (findProperty("final") != "true") {
-        version = "$version-SNAPSHOT"
+        version = "$version-hinge-SNAPSHOT"
+    } else {
+        version = "$version-hinge"
     }
 }
 
@@ -34,9 +37,3 @@ subprojects {
     apply(plugin = "otel.spotless-conventions")
 }
 
-nexusPublishing.repositories {
-    sonatype {
-        username.set(System.getenv("SONATYPE_USER"))
-        password.set(System.getenv("SONATYPE_KEY"))
-    }
-}
